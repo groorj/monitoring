@@ -2,10 +2,12 @@
 
 #########################################################################################
 # Date:		Sat 30 Jan 2016 19:10:39 EST
-# Version:	1.0.1
+# Version:	1.0.2
 # Author:	gustavo.aguiar@gmail.com
+# Github:	https://github.com/groorj/monitoring/
 # LastChange:	Sat 30 Jan 2016 19:51:09 EST	<gustavo.aguiar@gmail.com>	<1.0.0>
 # LastChange:	Sun 31 Jan 2016 11:47:46 EST	<gustavo.aguiar@gmail.com>	<1.0.1>
+# LastChange:	Sun 31 Jan 2016 12:27:15 EST	<gustavo.aguiar@gmail.com>	<1.0.2>
 # Request:	N/A
 # Description:	Shell script to validate if ssl cert is about to expire
 # Usage:	./check_cert_expiration_date.sh -d <domain_name> -c <days_prior_expire>
