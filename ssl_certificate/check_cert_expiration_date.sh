@@ -9,6 +9,7 @@
 # LastChange:   Sun 31 Jan 2016 11:47:46 EST    <gustavo.aguiar@gmail.com>      <1.0.1>
 # LastChange:   Sun 31 Jan 2016 12:27:15 EST    <gustavo.aguiar@gmail.com>      <1.0.2>
 # LastChange:   Fri Feb 26 18:22:36 BRT 2016    <fecotex@gmail.com>     	<1.0.3>
+# LastChange:   Mon Feb 29 12:37:15 BRT 2016    <fecotex@gmail.com>     	<1.0.4>
 # Request:      N/A
 # Description:  Shell script to validate if ssl cert is about to expire
 # Usage:        ./check_cert_expiration_date.sh -d <domain_name> -c <days_prior_expire>
@@ -144,14 +145,18 @@ if [ -z $PORT ]; then
 fi
 echo_verbose "PORT: $PORT"
 
+# Get cert info
+echo | openssl s_client -connect $DOMAIN:$PORT 2>/dev/null | openssl x509 -noout -subject -nameopt multiline -dates > /tmp/cert_verify.info
+
 # verify cert-cn X domain
-CN_FROM_CERT=`echo | openssl s_client -connect $DOMAIN:$PORT 2>/dev/null | openssl x509 -noout -subject -nameopt multiline | awk '/commonName/ {print$NF}'`
+CN_FROM_CERT=`cat /tmp/cert_verify.info | awk '/commonName/ {print$NF}'`
+echo_verbose "CN_FROM_CERT: $CN_FROM_CERT"
 
 (echo "$DOMAIN" | grep -Eq  ^$CN_FROM_CERT$)
 valid_neg
 
 # retrieve the expiration date from the SSL certificate using the openssl tool ;
-DATE_FROM_CERT=`echo | openssl s_client -connect $DOMAIN:$PORT 2>/dev/null | openssl x509 -noout -dates | tail -1 | tr -s " " |cut -d "=" -f2 | cut -d " " -f1,2,4`
+DATE_FROM_CERT=`cat /tmp/cert_verify.info | tail -1 | tr -s " " |cut -d "=" -f2 | cut -d " " -f1,2,4`
 echo_verbose "DATE_FROM_CERT: $DATE_FROM_CERT"
 
 # convert the expitation date from the certificate ;
@@ -179,6 +184,9 @@ DATE_DIFF=`expr $DATE2 - $DATE1`
 echo_verbose "DATE1: $DATE1"
 echo_verbose "DATE2: $DATE2"
 echo_verbose "DATE_DIFF: $DATE_DIFF"
+
+# clean certificate.info tmp file
+rm -f /tmp/cert_verify.info
 
 # check if the result from the calulation is greater then the specified days to alarm ;
 if [[ $DATE_DIFF -gt $DAYS_TO_ALERT_CRITC ]]; then
